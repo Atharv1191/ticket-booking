@@ -17,5 +17,5 @@ app.use(clerkMiddleware())
 
 
 app.get('/',(req,res)=>res.send("server is live"))
-app.use('/api/inngest', serve({ client: inngest, functions }));
+app.use('/api/inngest', serve({ client: inngest, functions,signingKey: null }));
 app.listen(port,()=>console.log(`server listening on port ${port}`))
