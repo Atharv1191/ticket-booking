@@ -4,9 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
     "server": "nodemon server.js",
-      "inngest": "inngest-cli dev -u http://localhost:4000/api/inngest"
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
@@ -21,8 +20,5 @@
     "inngest": "^3.39.2",
     "mongoose": "^8.16.1",
     "nodemon": "^3.1.10"
-  },
-  "devDependencies": {
-    "inngest-cli": "^1.8.2"
   }
 }
