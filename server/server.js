@@ -4,8 +4,8 @@ const cors = require("cors");
 const connectDB = require("./configs/db");
 require('dotenv').config()
 const { clerkMiddleware } = require("@clerk/express");
-const { serve } = require("inngest/express");
-const {inngest,functions} = require("./inngest/index")
+const { clerkWebhooks } = require("./controllers/clerkWebhooks");
+
 const app = express()
 const port = process.env.PORT||5000
  connectDB()
@@ -13,9 +13,18 @@ const port = process.env.PORT||5000
 //middeleweres
 app.use(express.json())
 app.use(cors())
-app.use(clerkMiddleware())
 
+
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf; // ✅ keep as Buffer
+    },
+  })
+);
+app.use(clerkMiddleware())
+app.post("/webhooks", clerkWebhooks);
 
 app.get('/',(req,res)=>res.send("server is live"))
-app.use('/api/inngest', serve({ client: inngest, functions }));
+// app.use('/api/inngest', serve({ client: inngest, functions }));
 app.listen(port,()=>console.log(`server listening on port ${port}`))

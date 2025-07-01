@@ -18,7 +18,8 @@
     "dotenv": "^17.0.0",
     "express": "^5.1.0",
     "mongoose": "^8.16.1",
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "svix": "^1.68.0"
   },
   "devDependencies": {
     "inngest": "^3.39.2",
