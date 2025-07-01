@@ -26,5 +26,5 @@ app.use(clerkMiddleware())
 app.post("/webhooks", clerkWebhooks);
 
 app.get('/',(req,res)=>res.send("server is live"))
-// app.use('/api/inngest', serve({ client: inngest, functions }));
+
 app.listen(port,()=>console.log(`server listening on port ${port}`))
