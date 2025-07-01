@@ -11,7 +11,7 @@ const port = process.env.PORT||5000
  connectDB()
 
 //middeleweres
-app.use(express.json())
+
 app.use(cors())
 
 
@@ -22,8 +22,9 @@ app.use(
     },
   })
 );
-app.use(clerkMiddleware())
 app.post("/webhooks", clerkWebhooks);
+app.use(clerkMiddleware())
+
 
 app.get('/',(req,res)=>res.send("server is live"))
 
