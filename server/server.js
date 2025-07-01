@@ -22,8 +22,9 @@ app.use(
     },
   })
 );
-app.post("/webhooks", clerkWebhooks);
 app.use(clerkMiddleware())
+app.post("/webhooks", clerkWebhooks);
+
 
 
 app.get('/',(req,res)=>res.send("server is live"))
