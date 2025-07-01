@@ -1,60 +1,81 @@
-
 const { Webhook } = require("svix");
 const User = require("../models/User");
 
-
 const clerkWebhooks = async (req, res) => {
-    try {
-        const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+  console.log("📨 Incoming Clerk webhook");
 
-        const evt = wh.verify(req.rawBody, {
-            "svix-id": req.headers["svix-id"],
-            "svix-timestamp": req.headers["svix-timestamp"],
-            "svix-signature": req.headers["svix-signature"]
-        });
+  try {
+    const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
-        const { data, type } = evt;
+    const evt = wh.verify(req.rawBody, {
+      "svix-id": req.headers["svix-id"],
+      "svix-timestamp": req.headers["svix-timestamp"],
+      "svix-signature": req.headers["svix-signature"]
+    });
 
-        switch (type) {
-            case 'user.created': {
-                const userData = {
-                    _id: data.id,
-                    email: data.email_addresses[0]?.email_address || "",
-                    name: `${data.first_name || ""} ${data.last_name || ""}`,
-                    image: data.image_url,
-                   
-                };
-                await User.create(userData);
-                res.status(200).json({});
-                break;
-            }
+    const { data, type } = evt;
+    console.log("🔔 Webhook type:", type);
+    console.log("📦 Webhook data:", data);
 
-            case 'user.updated': {
-                const userData = {
-                    email: data.email_addresses[0]?.email_address || "",
-                    name: `${data.first_name || ""} ${data.last_name || ""}`,
-                    image: data.image_url,
-                };
-                await User.findByIdAndUpdate(data.id, userData);
-                res.status(200).json({});
-                break;
-            }
+    switch (type) {
+      case 'user.created': {
+        const userData = {
+          _id: data.id,
+          email: data.email_addresses?.[0]?.email_address || "",
+          name: `${data.first_name || ""} ${data.last_name || ""}`,
+          image: data.image_url,
+        };
+        console.log("📥 Creating user in DB:", userData);
 
-            case 'user.deleted': {
-                await User.findByIdAndDelete(data.id);
-                res.status(200).json({});
-                break;
-            }
-
-            default:
-                res.status(200).json({});
-                break;
+        try {
+          await User.create(userData);
+          console.log("✅ User created successfully");
+        } catch (err) {
+          console.error("❌ MongoDB Create Error:", err.message);
         }
 
-    } catch (error) {
-        console.error("Webhook error:", error);
-        res.status(400).json({ success: false, message: error.message });
+        return res.status(200).json({ ok: true });
+      }
+
+      case 'user.updated': {
+        const userData = {
+          email: data.email_addresses?.[0]?.email_address || "",
+          name: `${data.first_name || ""} ${data.last_name || ""}`,
+          image: data.image_url,
+        };
+        console.log("✏️ Updating user:", data.id, userData);
+
+        try {
+          await User.findByIdAndUpdate(data.id, userData);
+          console.log("✅ User updated successfully");
+        } catch (err) {
+          console.error("❌ MongoDB Update Error:", err.message);
+        }
+
+        return res.status(200).json({ ok: true });
+      }
+
+      case 'user.deleted': {
+        console.log("🗑️ Deleting user:", data.id);
+        try {
+          await User.findByIdAndDelete(data.id);
+          console.log("✅ User deleted successfully");
+        } catch (err) {
+          console.error("❌ MongoDB Delete Error:", err.message);
+        }
+
+        return res.status(200).json({ ok: true });
+      }
+
+      default:
+        console.log("ℹ️ Unhandled webhook type:", type);
+        return res.status(200).json({ ok: true });
     }
+
+  } catch (error) {
+    console.error("❌ Webhook Verification Error:", error.message);
+    return res.status(400).json({ success: false, message: error.message });
+  }
 };
 
 module.exports = { clerkWebhooks };
