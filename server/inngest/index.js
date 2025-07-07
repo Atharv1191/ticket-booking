@@ -3,7 +3,7 @@ const { Inngest } = require("inngest");
 const User = require("../models/User");
 
 // Create a client to send and receive events
-const inngest = new Inngest({ id:"movie-ticket-booking " });
+const inngest = new Inngest({ id:"movie-ticket-booking" });
 
 //Inngest Functions to save user to a database
 const syncUserCreation = inngest.createFunction(
