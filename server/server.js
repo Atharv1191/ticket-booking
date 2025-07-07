@@ -15,13 +15,8 @@ connectDB();
 
 
 // ✅ Clerk needs rawBody for Svix
-app.use(
-  express.json({
-    verify: (req, res, buf) => {
-      req.rawBody = buf; // ✅ keep as Buffer
-    },
-  })
-);
+
+app.use(express.json());
 
 // ✅ Clerk middleware
 app.use(clerkMiddleware());
