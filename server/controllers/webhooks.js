@@ -1,7 +1,6 @@
-const { Webhook } = require("svix");
-const User = require("../models/User");
-
 const clerkWebhooks = async (req, res) => {
+    console.log("📨 Webhook received at /webhooks");
+
     try {
         const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
@@ -11,6 +10,7 @@ const clerkWebhooks = async (req, res) => {
             "svix-signature": req.headers["svix-signature"]
         });
 
+        console.log("✅ Webhook verified:", evt.type);
         const { data, type } = evt;
 
         switch (type) {
@@ -24,11 +24,16 @@ const clerkWebhooks = async (req, res) => {
                     image: data.image_url,
                 };
 
-                await User.create(userData);
+                console.log("👤 Creating user:", userData);
+
+                const createdUser = await User.create(userData);
+                console.log("✅ User saved to DB:", createdUser._id);
                 break;
             }
 
             case 'user.updated': {
+                console.log("🔄 Updating user:", data.id);
+
                 const fullName = `${data.first_name || ""} ${data.last_name || ""}`.trim() || data.email_addresses[0]?.email_address || "User";
 
                 const userData = {
@@ -42,11 +47,13 @@ const clerkWebhooks = async (req, res) => {
             }
 
             case 'user.deleted': {
+                console.log("🗑️ Deleting user:", data.id);
                 await User.findByIdAndDelete(data.id);
                 break;
             }
 
             default:
+                console.warn("⚠️ Unhandled Clerk event type:", type);
                 break;
         }
 
@@ -56,5 +63,3 @@ const clerkWebhooks = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 };
-
-module.exports = { clerkWebhooks };
