@@ -28,6 +28,8 @@ connectDB();
 // ✅ Other API routes
 app.get("/", (req, res) => res.send("Server is live"));
 app.use('/api/inngest',serve({client:inngest,functions}))
+
+
 app.use("/api/shows", showRoute);
 app.use("/api/booking", bookingRoute);
 app.use("/api/admin", adminRoute);
