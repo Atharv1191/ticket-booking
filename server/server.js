@@ -55,11 +55,7 @@ const userRoute = require("./routes/userRoutes");
 const app = express();
 
 // ✅ Middleware to capture rawBody for Clerk webhook verification
-app.use(express.json({
-  verify: (req, res, buf) => {
-    req.rawBody = buf; // Required for svix.verify()
-  }
-}));
+app.use(express.json({}));
 
 // ✅ Enable CORS
 app.use(cors());
