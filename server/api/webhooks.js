@@ -66,7 +66,7 @@ const clerkWebhooks = async (req, res) => {
   try {
     const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
-    const evt = wh.verify(req.body.toString(), {
+    const evt = wh.verify(req.body, {
       "svix-id": req.headers["svix-id"],
       "svix-timestamp": req.headers["svix-timestamp"],
       "svix-signature": req.headers["svix-signature"]
@@ -100,7 +100,7 @@ const clerkWebhooks = async (req, res) => {
         break;
 
       default:
-        console.log("ℹ️ Unhandled event:", type);
+        console.log("ℹ️ Unhandled event type:", type);
     }
 
     return res.status(200).json({ success: true });
