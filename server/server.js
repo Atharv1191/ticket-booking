@@ -45,7 +45,7 @@ require("dotenv").config();
 
 const connectDB = require("./configs/db");
 const { clerkMiddleware } = require("@clerk/express");
-const { clerkWebhooks } = require("./controllers/webhooks");
+const { clerkWebhooks } = require("./api/webhooks");
 
 const showRoute = require("./routes/showRoutes");
 const bookingRoute = require("./routes/bookingRoutes");
@@ -71,7 +71,7 @@ app.use(clerkMiddleware());
 connectDB();
 
 // ✅ Webhook route for Clerk (must come after rawBody setup)
-app.post("/webhooks", clerkWebhooks);
+app.post("/api/webhooks", clerkWebhooks);
 
 // ✅ API routes
 app.get("/", (req, res) => res.send("Server is live"));
