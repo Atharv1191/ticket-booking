@@ -1,12 +1,7 @@
 const { Inngest } = require("inngest");
 const User = require("../models/User");
 
-const inngest = new Inngest({
-  id: "movie-ticket-booking",
-  eventKey: process.env.INNGEST_EVENT_KEY,
-  signingKey: process.env.INNGEST_SIGNING_KEY,
-  mode: "cloud",
-});
+const inngest = new Inngest({id: "movie-ticket-booking"})
 
 const syncUserCreation = inngest.createFunction(
   { id: "sync-user-from-clerk" },

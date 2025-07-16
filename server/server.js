@@ -4,17 +4,17 @@ require("dotenv").config();
 
 const connectDB = require("./configs/db");
 const { clerkMiddleware } = require("@clerk/express");
-const { clerkWebhooks } = require("./api/webhooks");
 
 const showRoute = require("./routes/showRoutes");
 const bookingRoute = require("./routes/bookingRoutes");
 const adminRoute = require("./routes/adminRoutes");
 const userRoute = require("./routes/userRoutes");
+const { serve } = require("inngest/express");
+const { inngest,functions } = require("./inngest/index");
 
 const app = express();
 
-// ✅ 1. Use raw body ONLY for webhooks BEFORE express.json()
-app.use("/api/webhooks", express.raw({ type: "application/json" }));
+
 
 // ✅ 2. Global middleware for the rest of your app
 app.use(express.json());
@@ -24,11 +24,10 @@ app.use(clerkMiddleware());
 // ✅ Connect to MongoDB
 connectDB();
 
-// ✅ 3. Define the webhook route AFTER raw body middleware
-app.post("/api/webhooks", clerkWebhooks);
 
 // ✅ Other API routes
 app.get("/", (req, res) => res.send("Server is live"));
+app.use('/api/inngest',serve({client:inngest,functions}))
 app.use("/api/shows", showRoute);
 app.use("/api/booking", bookingRoute);
 app.use("/api/admin", adminRoute);
