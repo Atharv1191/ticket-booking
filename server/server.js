@@ -17,6 +17,7 @@ const app = express();
 
 
 
+app.use('/api/stripe',express.raw({type:"application/json"}),stripeWebhooks)
 // ✅ 2. Global middleware for the rest of your app
 app.use(express.json());
 app.use(cors());
@@ -25,7 +26,6 @@ app.use(clerkMiddleware());
 
 //stripe webhook route
 
-app.use('/api/stripe',express.raw({type:"application/json"}),stripeWebhooks)
 
 // ✅ Connect to MongoDB
 connectDB();
