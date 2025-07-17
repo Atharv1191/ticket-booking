@@ -16,7 +16,15 @@ import ListShows from './pages/Admin/ListShows'
 import ListBookings from './pages/Admin/ListBookings'
 import { useAppContext } from './context/AppContext'
 import { SignIn } from '@clerk/clerk-react'
+import { useAuth } from "@clerk/clerk-react";
+import { useEffect } from 'react'
+import Loading from './components/Loading'
 const App = () => {
+   const {getToken} = useAuth()
+  useEffect(()=>{
+    getToken().then((token)=>console.log(token))
+
+  },[])
   const isAdminRoute = useLocation().pathname.startsWith("/admin")
   const {user} = useAppContext()
   return (
@@ -29,6 +37,7 @@ const App = () => {
         <Route path='/movies/:id' element={<MovieDetails />} />
         <Route path='/movies/:id/:date' element={<SeatLayout />} />
         <Route path='/my-bookings' element={<MyBookings />} />
+        <Route path='/loading/:nextUrl' element={<Loading />} />
         <Route path='/favorite' element={<Favourite />} />
         <Route path='/admin/*' element={user ?<Layout />:(
           <div className='min-h-screen flex justify-center items-center'>

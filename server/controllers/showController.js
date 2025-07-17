@@ -28,22 +28,26 @@ const getNowPlayingMovies = async(req,res)=>{
 //API to add a new show to a database
 
 
+
+
 const addShow = async (req, res) => {
   try {
     const { movieId, showsInput, showPrice } = req.body;
 
-    // Check if movie already exists in DB
     let movie = await Movie.findById(movieId);
 
     if (!movie) {
-      // Fetch from TMDB if not in DB
       const [movieDetailsResponse, movieCreditsResponse] = await Promise.all([
         axios.get(`https://api.themoviedb.org/3/movie/${movieId}`, {
-          headers: { Authorization: `Bearer ${process.env.TMDB_API_KEY}` }
+          headers: {
+            Authorization: `Bearer ${process.env.TMDB_API_KEY}`
+          }
         }),
         axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits`, {
-          headers: { Authorization: `Bearer ${process.env.TMDB_API_KEY}` }
-        })
+          headers: {
+            Authorization: `Bearer ${process.env.TMDB_API_KEY}`
+          }
+        }),
       ]);
 
       const movieApiData = movieDetailsResponse.data;
@@ -61,7 +65,7 @@ const addShow = async (req, res) => {
         orignal_language: movieApiData.original_language,
         tagline: movieApiData.tagline || "",
         vote_average: movieApiData.vote_average,
-        runtime: movieApiData.runtime
+        runtime: movieApiData.runtime,
       };
 
       movie = await Movie.create(movieDetails);
@@ -69,10 +73,10 @@ const addShow = async (req, res) => {
 
     const showsToCreate = [];
 
-    showsInput.forEach(show => {
-      const showDate = show.date; // format: YYYY-MM-DD
-      show.time.forEach(time => {
-        const dateTimeString = `${showDate}T${time}`; // e.g. 2025-07-09T14:00
+    showsInput.forEach((show) => {
+      const showDate = show.date;
+      show.time.forEach((time) => {
+        const dateTimeString = `${showDate}T${time}`;
         const dateTime = new Date(dateTimeString);
 
         if (dateTime > new Date()) {
@@ -80,7 +84,7 @@ const addShow = async (req, res) => {
             movie: movieId,
             showDateTime: dateTime,
             showPrice,
-            occupiedSeats: {}
+            occupiedSeats: {},
           });
         } else {
           console.log("⏱️ Skipping past show time:", dateTime.toISOString());
@@ -94,18 +98,31 @@ const addShow = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Shows added successfully"
+      message: "Shows added successfully",
+    });
+  } catch (error) {
+    console.error("❌ Error in addShow:", {
+      message: error.message,
+      code: error.code,
+      stack: error.stack,
+      response: error.response?.data || null,
     });
 
-  } catch (error) {
-    console.error("❌ Error in addShow:", error.message);
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
-//API to get all shows from database
+
+
+
+
+
+
+
+
+// API to get all shows from database
 
 const getShows = async (req, res) => {
   try {

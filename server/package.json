@@ -10,7 +10,8 @@
     "inngest": "^3.40.0",
     "mongoose": "^8.16.1",
     "nodemon": "^3.1.10",
-    "svix": "^1.68.0"
+    "stripe": "^18.3.0",
+    "svix": "^1.69.0"
   },
   "scripts": {
     "start": "node server.js",

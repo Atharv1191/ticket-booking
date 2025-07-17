@@ -4,6 +4,7 @@
 
 const Booking = require("../models/Booking");
 const Show = require("../models/Show")
+const stripe = require("stripe")
 
 const checkSeatsAvailibility = async (showId, selectedSeats) => {
     try {
@@ -47,7 +48,7 @@ const createBooking = async (req, res) => {
             user: userId,
             show: showId,
             amount: showData.showPrice * selectedSeats.length,
-            bookingSeats: selectedSeats
+           bookedSeats: selectedSeats 
 
         })
         selectedSeats.map((seat) => {
@@ -58,9 +59,39 @@ const createBooking = async (req, res) => {
         await showData.save()
 
         //stripe payment getway initialize
+        const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY)
+        //line-items for stripe
+
+        const line_items = [{
+            price_data:{
+                currency:"inr",
+                product_data:{
+                    name:showData.movie.title,
+                
+                },
+                unit_amount:Math.floor(booking.amount) *100
+            },
+            quantity:1
+        }]
+        const session = await stripeInstance.checkout.sessions.create({
+            success_url:`${origin}/loading/my-bookings`,
+            cancel_url:`${origin}/my-bookings`,
+            line_items:line_items,
+            mode:'payment',
+            metadata:{
+                bookingId:booking._id.toString()
+
+            },
+            expires_at:Math.floor(Date.now()/1000) + 30 *60
+        })
+        booking.paymentLink = session.cancel_url
+        await booking.save()
+
+
+
         res.json({
             success: true,
-            message: "Booked Successfully"
+            url:session.url
         })
     } catch (error) {
         console.log(error.message)

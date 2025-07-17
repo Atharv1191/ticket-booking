@@ -1,6 +1,6 @@
 
 const express = require("express");
-const { getNowPlayingMovies, addShow, getShows, getShow } = require("../controllers/showController");
+const { getNowPlayingMovies, getShows, getShow, addShow } = require("../controllers/showController");
 const protectAdmin = require("../middelewere/auth");
 
 const router = express.Router();
