@@ -215,41 +215,44 @@ const sendShowReminders = inngest.createFunction(
 );
 
 //send new show notifications
+
 const sendNewShowNtifications = inngest.createFunction(
   { id: "send-new-show-notification" },
   { event: "app/show.added" },
   async ({ event }) => {
-    const { movieTitle } = event.data;
+    const { movieTitle, movieId } = event.data;
 
     const users = await User.find({});
 
     for (const user of users) {
-      const userEmail = user.email;
-      const username = user.name;
-      const subject = `🎬 New Show Added: ${movieTitle}`;
+      try {
+        const userEmail = user.email;
+        const username = user.name;
+        const subject = `🎬 New Show Added: ${movieTitle}`;
 
-      const body = `
-        <div style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2>Hi ${username},</h2>
-          <p>We've just added a new show to our library:</p>
-          <h3 style="color: #F84565;">"${movieTitle}"</h3>
-          <br/>
-          <p><a href="https://quickshow.com/movies/${movieId}" style="color: #007bff;">View the show on our website</a></p>
-          <br/>
-          <p>Thanks,<br/>QuickShow Team</p>
-        </div>
-      `;
+        const body = `
+          <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2>Hi ${username},</h2>
+            <p>We've just added a new show to our library:</p>
+            <h3 style="color: #F84565;">"${movieTitle}"</h3>
+            <br/>
+            <p><a href="https://quickshow.com/movies/${movieId}" style="color: #007bff;">View the show on our website</a></p>
+            <br/>
+            <p>Thanks,<br/>QuickShow Team</p>
+          </div>
+        `;
 
-      await sendEmail({
-        to: userEmail,
-        subject,
-        body,
-      });
+        await sendEmail({ to: userEmail, subject, body });
+      } catch (err) {
+        console.error(`❌ Failed to send email to ${user.email}:`, err.message);
+      }
     }
 
-    return { message: "Notifications sent to all users." };
+    return { message: "Notifications attempted for all users." };
   }
 );
+
+
 
 
 
