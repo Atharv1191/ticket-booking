@@ -2,6 +2,7 @@
 
 //function to check availibility of selected seats for a movie
 
+const { inngest } = require("../inngest/index");
 const Booking = require("../models/Booking");
 const Show = require("../models/Show")
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
@@ -163,7 +164,13 @@ const createBooking = async (req, res) => {
 
     booking.paymentLink = session.cancel_url;
     await booking.save();
-
+    //run inngest schedular function to check payment status affter 10 minuites
+    await inngest.send({
+      name:"app/checkpayment",
+      data:{
+        bookingId:booking._id.toString()
+      }
+    })
     res.json({
       success: true,
       url: session.url,
