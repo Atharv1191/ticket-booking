@@ -51,6 +51,7 @@
 // module.exports = { stripeWebhooks };
 const Stripe = require("stripe");
 const Booking = require("../models/Booking");
+const { inngest } = require("../inngest/index");
 
 const stripeWebhooks = async (request, response) => {
   const stripeInstance = Stripe(process.env.STRIPE_SECRET_KEY);
@@ -82,6 +83,11 @@ const stripeWebhooks = async (request, response) => {
         isPaid: true,
         paymentLink: "",
       });
+      //send confirmation email
+      await inngest.send({
+        name:"app/show.booked",
+        data:{bookingId}
+      })
     }
 
     response.json({ received: true });
