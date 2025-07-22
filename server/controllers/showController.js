@@ -31,6 +31,7 @@ const getNowPlayingMovies = async(req,res)=>{
 
 
 
+
 const addShow = async (req, res) => {
   try {
     const { movieId, showsInput, showPrice } = req.body;
@@ -214,5 +215,48 @@ const getShow = async (req, res) => {
     });
   }
 };
+const getMixedMovies = async (req, res) => {
+  try {
+    // Hollywood: Now Playing
+    const hollywoodRes = await axios.get("https://api.themoviedb.org/3/movie/now_playing", {
+      headers: {
+        Authorization: `Bearer ${process.env.TMDB_API_KEY}`
+      }
+    });
 
-module.exports = {getNowPlayingMovies,addShow,getShows,getShow}
+    const hollywoodMovies = hollywoodRes.data.results;
+
+    // Bollywood: Filtered from Discover
+    const bollywoodRes = await axios.get("https://api.themoviedb.org/3/discover/movie", {
+      params: {
+        with_original_language: "hi", // Hindi
+        sort_by: "popularity.desc",
+        region: "IN"
+      },
+      headers: {
+        Authorization: `Bearer ${process.env.TMDB_API_KEY}`
+      }
+    });
+
+    const bollywoodMovies = bollywoodRes.data.results;
+
+    // Combine both
+    const combinedMovies = [...hollywoodMovies, ...bollywoodMovies];
+
+    res.json({
+      success: true,
+      movies: combinedMovies,
+    });
+
+  } catch (error) {
+    console.error("❌ Error in getMixedMovies:", error.message);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch movies",
+    });
+  }
+};
+
+
+
+module.exports = {getNowPlayingMovies,addShow,getShows,getShow,getMixedMovies};

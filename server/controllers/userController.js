@@ -191,4 +191,5 @@ const getFavourites = async (req, res) => {
     }
 };
 
+
 module.exports = { getUserBokkings, updateFavourite, getFavourites };

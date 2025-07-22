@@ -5,7 +5,7 @@ const { createBooking, getOccupiedSeats } = require("../controllers/bookingContr
 const router = express.Router()
 
 router.post("/create",createBooking)
-router.get("/seats:showId",getOccupiedSeats)
+router.get("/seats/:showId",getOccupiedSeats)
 
 module.exports = router;
 
